@@ -2,14 +2,21 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-app.get('/', function (req, res) {
-    res.send('<h1>Welcome Realtime Server</h1>');
-});
-
 // 在线用户
 var onlineUsers = {};
 // 当前在线人数
 var onlineCount = 0;
+let chatlog = []
+let rooms = {
+}
+
+app.get('/', function (req, res) {
+    res.send('<h1>Welcome Realtime Server</h1>');
+});
+
+app.get('/logs', (req, res) => {
+    res.json(chatlog)
+})
 
 io.on('connection', function (socket) {
     console.log('a user connected');
@@ -67,6 +74,7 @@ io.on('connection', function (socket) {
         } else {
             //向所有客户端广播发布的消息
             io.emit('message', obj);
+            chatlog.push(obj)
             console.log(obj.username + '说：' + obj.content + '**');
         }
 
